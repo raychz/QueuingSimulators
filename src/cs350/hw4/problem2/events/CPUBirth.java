@@ -1,4 +1,11 @@
-package cs350.hw4.problem2;
+package cs350.hw4.problem2.events;
+
+import cs350.hw4.problem2.Controller;
+import cs350.hw4.problem2.MM1System;
+import cs350.hw4.problem2.MM2System;
+import cs350.hw4.problem2.QueuingSystem;
+import cs350.hw4.problem2.Request;
+import cs350.hw4.problem2.utilities.RandomGenerator;
 
 /**
  * <p>
@@ -8,14 +15,16 @@ package cs350.hw4.problem2;
  * 
  * @author Raymond Chavez {@literal <rchavez9@bu.edu>}
  */
-public class Birth extends Event {
+public class CPUBirth extends Event {
 	private Request r = new Request();
+	private MM2System m;
 
-	public Birth(Controller c, MM1System m) {
-		super(c, m);
-		r.setIAT(m.genExpRV(m.lambda));
+	public CPUBirth(Controller c, MM2System m) {
+		super(c);
+		this.m = m;
+		r.setIAT(RandomGenerator.genExpRV(m.lambda));
 		r.setArrival(c.getCurrentTime() + r.getIAT());
-		r.setTs(m.genExpRV(1.0 / m.Ts));
+		r.setTs(RandomGenerator.genExpRV(1.0 / m.Ts));
 	}
 
 	/**
@@ -31,8 +40,9 @@ public class Birth extends Event {
 		 */
 		m.requestQueue.add(this.r);
 
-		if (c.getCurrentTime() >= m.getSimulationTime())
-			m.numArrivals++;
+		if (c.getCurrentTime() >= c.getSimulationTime())
+			// TODO
+			c.logger.numArrivals++;
 
 		/*
 		 * If this request happens to be the only one in the system (i.e., the
@@ -42,9 +52,26 @@ public class Birth extends Event {
 		 * "service time" according to the distribution of service times and
 		 * adding that to the current time.
 		 */
-		if (m.requestQueue.size() == 1) {
+		// if (m.requestQueue.size() == 1) {
+		// double deathTime = c.getCurrentTime() + r.getTs();
+		// c.addEvent(new Death(c, m, deathTime));
+		// }
+		//
+		// if (m.requestQueue.size() > 0) {
+		// double deathTime = c.getCurrentTime() + r.getTs();
+		// c.addEvent(new Death(c, m, deathTime));
+		// }
+
+		if (!m.isCPU1Busy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
-			c.addEvent(new Death(c, m, deathTime));
+			c.addEvent(new CPU1Death(c, m, deathTime));
+			m.setCPU1Busy(true);
+		}
+
+		else if (!m.isCPU2Busy()) {
+			double deathTime = c.getCurrentTime() + r.getTs();
+			c.addEvent(new CPU2Death(c, m, deathTime));
+			m.setCPU2Busy(true);
 		}
 
 		/*
@@ -53,7 +80,7 @@ public class Birth extends Event {
 		 * "IAT time" according to the specified distribution of IAT times, and
 		 * adding that to the current time.
 		 */
-		c.addEvent(new Birth(c, m));
+		c.addEvent(new CPUBirth(c, m));
 	}
 
 	@Override

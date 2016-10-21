@@ -1,4 +1,9 @@
-package cs350.hw4.problem2;
+package cs350.hw4.problem2.events;
+
+import cs350.hw4.problem2.Controller;
+import cs350.hw4.problem2.MM1System;
+import cs350.hw4.problem2.MM2System;
+import cs350.hw4.problem2.QueuingSystem;
 
 /**
  * <p>
@@ -9,14 +14,11 @@ package cs350.hw4.problem2;
  * @author Raymond Chavez {@literal <rchavez9@bu.edu>}
  */
 public abstract class Event {
-	protected MM1System m;
 	protected Controller c;
 	protected double eventTime;
-	// protected Request r;
 
-	public Event(Controller c, MM1System m) {
+	public Event(Controller c) {
 		this.c = c;
-		this.m = m;
 	}
 
 	public abstract void exec();

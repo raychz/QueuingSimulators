@@ -9,16 +9,12 @@ package cs350.hw4.problem2;
  * @author Raymond Chavez {@literal <rchavez9@bu.edu>}
  */
 public abstract class QueuingSystem {
-	protected int simulationTime;
-	protected String systemName;
+	//protected int simulationTime;
+	protected final String systemName;
 
-	public QueuingSystem() {
-		this.simulationTime = 0;
+	public QueuingSystem(String systemName) {
+		this.systemName = systemName;
 	}
 
-	public int getSimulationTime() {
-		return simulationTime;
-	}
-
-	public abstract void printStatistics();
+	//public abstract void printStatistics();
 }

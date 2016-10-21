@@ -1,4 +1,8 @@
-package cs350.hw4.problem2;
+package cs350.hw4.problem2.events;
+
+import cs350.hw4.problem2.Controller;
+import cs350.hw4.problem2.MM1System;
+import cs350.hw4.problem2.QueuingSystem;
 
 /**
  * <p>
@@ -11,24 +15,24 @@ package cs350.hw4.problem2;
 public class Monitor extends Event {
 	private double startTime;
 
-	public Monitor(Controller c, MM1System m) {
-		super(c, m);
+	public Monitor(Controller c, QueuingSystem q) {
+		super(c, q);
 		/*
 		 * We must start performing monitors after the warm up period has
 		 * completed
 		 */
-		startTime = c.getCurrentTime() == 0 ? m.getSimulationTime() : c.getCurrentTime() + m.genExpRV(2 * m.lambda);
+		startTime = c.getCurrentTime() == 0 ? c.getSimulationTime() : c.getCurrentTime() + m.genExpRV(2 * m.lambda);
 	}
 
 	@Override
 	public void exec() {
-		m.numMonitors++;
+		q.numMonitors++;
 
 		// Schedule new monitor event
-		c.addEvent(new Monitor(c, m));
+		c.addEvent(new Monitor(c, q));
 
-		int curQ = m.requestQueue.size();
-		int curW = (curQ > 0) ? (m.requestQueue.size() - 1) : 0;
+		int curQ = q.requestQueue.size();
+		int curW = (curQ > 0) ? (q.requestQueue.size() - 1) : 0;
 		m.wTotal += curW;
 		m.qTotal += curQ;
 	}
