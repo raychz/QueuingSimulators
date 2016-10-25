@@ -26,9 +26,13 @@ public class SimulationTest {
 		System.out.printf("-- Now simulating system: %s -- \n\n", systemName);
 		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
 
+		// HW4.2
+		MM2System CPU1 = new MM2System("CPU1", 40, 0.02);
+		MM1System disk1 = new MM1System("Disk1", 0.1);
+		MM1System network1 = new MM1System("Network1", 0.025);
+		State s1 = new State("HW4.1", CPU1, disk1, network1);
 		Controller c1 = new Controller(1000);
-		MM1System m1 = new MM1System(systemName, c1, 5, 0.15);
-		c1.start(m1);
+		c1.start(s1);
 
 		systemName = "HW3_1b";
 		System.out.printf("-- Now Simulating System %s -- \n\n", systemName);

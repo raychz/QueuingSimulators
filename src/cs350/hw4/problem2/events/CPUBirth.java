@@ -5,6 +5,7 @@ import cs350.hw4.problem2.MM1System;
 import cs350.hw4.problem2.MM2System;
 import cs350.hw4.problem2.QueuingSystem;
 import cs350.hw4.problem2.Request;
+import cs350.hw4.problem2.State;
 import cs350.hw4.problem2.utilities.RandomGenerator;
 
 /**
@@ -16,15 +17,16 @@ import cs350.hw4.problem2.utilities.RandomGenerator;
  * @author Raymond Chavez {@literal <rchavez9@bu.edu>}
  */
 public class CPUBirth extends Event {
-	private Request r = new Request();
-	private MM2System m;
+	private final Request r = new Request();
+	//private MM2System m;
+	private final MM2System CPU;
 
-	public CPUBirth(Controller c, MM2System m) {
-		super(c);
-		this.m = m;
-		r.setIAT(RandomGenerator.genExpRV(m.lambda));
-		r.setArrival(c.getCurrentTime() + r.getIAT());
-		r.setTs(RandomGenerator.genExpRV(1.0 / m.Ts));
+	public CPUBirth(Controller c, State s) {
+		super(c, s);
+		this.CPU = s.getCPU();
+		this.r.setIAT(RandomGenerator.genExpRV(CPU.lambda));
+		this.r.setArrival(c.getCurrentTime() + r.getIAT());
+		this.r.setTs(RandomGenerator.genExpRV(1.0 / CPU.Ts));
 	}
 
 	/**
@@ -38,7 +40,7 @@ public class CPUBirth extends Event {
 		/*
 		 * Add this new request to queue of arrivals.
 		 */
-		m.requestQueue.add(this.r);
+		CPU.requestQueue.add(this.r);
 
 		if (c.getCurrentTime() >= c.getSimulationTime())
 			// TODO
@@ -62,16 +64,16 @@ public class CPUBirth extends Event {
 		// c.addEvent(new Death(c, m, deathTime));
 		// }
 
-		if (!m.isCPU1Busy()) {
+		if (!CPU.isCPU1Busy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
-			c.addEvent(new CPU1Death(c, m, deathTime));
-			m.setCPU1Busy(true);
+			c.addEvent(new CPU1Death(c, s, deathTime));
+			CPU.setCPU1Busy(true);
 		}
 
-		else if (!m.isCPU2Busy()) {
+		else if (!CPU.isCPU2Busy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
-			c.addEvent(new CPU2Death(c, m, deathTime));
-			m.setCPU2Busy(true);
+			c.addEvent(new CPU2Death(c, s, deathTime));
+			CPU.setCPU2Busy(true);
 		}
 
 		/*
@@ -80,7 +82,7 @@ public class CPUBirth extends Event {
 		 * "IAT time" according to the specified distribution of IAT times, and
 		 * adding that to the current time.
 		 */
-		c.addEvent(new CPUBirth(c, m));
+		c.addEvent(new CPUBirth(c, s));
 	}
 
 	@Override

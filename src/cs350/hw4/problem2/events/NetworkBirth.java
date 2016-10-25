@@ -6,16 +6,16 @@ import cs350.hw4.problem2.Request;
 import cs350.hw4.problem2.State;
 import cs350.hw4.problem2.utilities.RandomGenerator;
 
-public class DiskBirth extends Event {
+public class NetworkBirth extends Event {
 	private Request r = new Request();
-	private MM1System disk;
-
-	public DiskBirth(Controller c, State s) {
+	private MM1System network;
+	
+	public NetworkBirth(Controller c, State s) {
 		super(c, s);
-		this.disk = s.getDisk();
-		r.setIAT(RandomGenerator.genExpRV(disk.lambda));
+		this.network = s.getNetwork();
+		r.setIAT(RandomGenerator.genExpRV(network.lambda));
 		r.setArrival(c.getCurrentTime() + r.getIAT());
-		r.setTs(RandomGenerator.genExpRV(1.0 / disk.Ts));
+		r.setTs(RandomGenerator.genExpRV(1.0 / network.Ts));
 	}
 
 	@Override
@@ -23,10 +23,10 @@ public class DiskBirth extends Event {
 		/*
 		 * Add this new request to queue of arrivals.
 		 */
-		disk.requestQueue.add(this.r);
+		network.requestQueue.add(this.r);
 
 		if (c.getCurrentTime() >= c.getSimulationTime())
-			disk.numArrivals++;
+			network.numArrivals++;
 		
 		/*
 		 * If this request happens to be the only one in the system (i.e., the
@@ -36,7 +36,7 @@ public class DiskBirth extends Event {
 		 * "service time" according to the distribution of service times and
 		 * adding that to the current time.
 		 */
-		if (disk.requestQueue.size() == 1) {
+		if (network.requestQueue.size() == 1) {
 			double deathTime = c.getCurrentTime() + r.getTs();
 			c.addEvent(new DiskDeath(c, s, deathTime));
 		}
@@ -54,4 +54,5 @@ public class DiskBirth extends Event {
 	public double getTime() {
 		return r.getArrival();
 	}
+
 }

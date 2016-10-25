@@ -7,6 +7,7 @@ import cs350.hw4.problem2.Controller;
 import cs350.hw4.problem2.MM1System;
 import cs350.hw4.problem2.MM2System;
 import cs350.hw4.problem2.Request;
+import cs350.hw4.problem2.State;
 import cs350.hw4.problem2.utilities.RandomGenerator;
 
 /**
@@ -18,29 +19,29 @@ import cs350.hw4.problem2.utilities.RandomGenerator;
  * @author Raymond Chavez {@literal <rchavez9@bu.edu>}
  */
 public class CPU1Death extends Event {
-	private MM2System m;
+	private final MM2System CPU;
 
-	public CPU1Death(Controller c, MM2System m, double eventTime) {
-		super(c);
-		this.m = m;
+	public CPU1Death(Controller c, State s, double eventTime) {
+		super(c, s);
+		this.CPU = s.getCPU();
 		this.eventTime = eventTime;
 	}
 
 	@Override
 	public void exec() {
 		// Remove the record of the request from the queue in the system, m.
-		Request r = m.requestQueue.remove();
+		Request r = CPU.requestQueue.remove();
 
 		// Make CPU core 1 available
-		m.setCPU1Busy(false);
+		CPU.setCPU1Busy(false);
 
 		double rand = RandomGenerator.genDouble();
 		if (rand <= 0.1) {
-			c.addEvent(new DiskBirth(c,m));
+			c.addEvent(new DiskBirth(c,s));
 		}
 
 		else if (rand <= 0.5) {
-			c.addEvent(new NetworkBirth(c,m));
+			c.addEvent(new NetworkBirth(c,s));
 		}
 		
 		else {
@@ -53,10 +54,10 @@ public class CPU1Death extends Event {
 
 		// Upon completion of service, check if other requests
 		// are pending in the queue.
-		if (m.requestQueue.size() > 0) {
-			Request nextReq = m.requestQueue.peek();
+		if (CPU.requestQueue.size() > 0) {
+			Request nextReq = CPU.requestQueue.peek();
 			double deathTime = c.getCurrentTime() + nextReq.getTs();
-			c.addEvent(new CPU1Death(c, m, deathTime));
+			c.addEvent(new CPU1Death(c, s, deathTime));
 		}
 	}
 

@@ -18,30 +18,36 @@ import cs350.hw4.problem2.events.Monitor;
 public class MM1System extends QueuingSystem {
 	public final double lambda;
 	public final double Ts;
-	protected final Queue<Request> requestQueue;
-	private final Controller c;
+	public final Queue<Request> requestQueue;
 
 	// Variables to monitor the state of the system.
-	protected int numArrivals, numDepartures, numMonitors;
+	public int numArrivals;
+	protected int numDepartures;
+	protected int numMonitors;
 	protected double TqTotal, TwTotal, TsTotal, rhoTotal, wTotal, qTotal;
 
-	public MM1System(String systemName, Controller c, double lambda, double Ts) {
+	public MM1System(String systemName, double lambda, double Ts) {
 		super(systemName);
 		//this.simulationTime = simulationTime;
 		this.lambda = lambda;
 		this.Ts = Ts;
 		this.requestQueue = new LinkedList<Request>();
-		this.c = c;
 
 		// Initialize new MM1System with a birth and monitor event.
-		this.c.addEvent(new Birth(c, this));
-		this.c.addEvent(new Monitor(c, this));
+		// TODO Create new way of initializing this!
+		//this.c.addEvent(new Birth(c, this));
+		//this.c.addEvent(new Monitor(c, this));
+	}
+
+	// Used for a system with no external requests
+	public MM1System(String string, double d) {
+		// TODO Auto-generated constructor stub
 	}
 
 	public void printStatistics() {
 		System.out.printf("-- Simulation %s Complete --\n\n", systemName);
 		System.out.println("System Parameters:");
-		System.out.printf("Lambda: %.3f \t Ts: %.3f \t Sim. Time: %d \n \n", lambda, Ts, c.getSimulationTime());
+		//System.out.printf("Lambda: %.3f \t Ts: %.3f \t Sim. Time: %d \n \n", lambda, Ts, c.getSimulationTime());
 
 		System.out.println("Arrivals:\t " + numArrivals);
 		System.out.println("Departures:\t " + numDepartures);

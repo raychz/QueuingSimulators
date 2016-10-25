@@ -25,6 +25,7 @@ public class Controller {
 	private PriorityQueue<Event> schedule;
 	private PrintWriter writer;
 	private String systemName;
+	public State state;
 
 	public Logger logger = new Logger(this);
 
@@ -42,8 +43,9 @@ public class Controller {
 		});
 	}
 
-	public void start(QueuingSystem s) {
-		this.systemName = s.systemName;
+	public void start(State s) {
+		this.state = s;
+		this.systemName = s.getStateName();
 		log("IAT,Ts,Arrival,Start,End,Tq,Tw");
 
 		// We run the simulator twice as long to allow for a warm-up period
