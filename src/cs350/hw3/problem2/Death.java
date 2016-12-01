@@ -40,7 +40,6 @@ public class Death extends Event {
 			r.setEnd(c.getCurrentTime());
 			r.setStart(r.getEnd() - r.getTs());
 			r.setTq(r.getEnd() - r.getArrival());
-			// TODO maybe use rho here!
 			r.setTw(r.getTq() - r.getTs());
 
 			c.log(r.toString());

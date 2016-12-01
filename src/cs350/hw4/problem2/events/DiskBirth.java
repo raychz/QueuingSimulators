@@ -13,9 +13,9 @@ public class DiskBirth extends Event {
 	public DiskBirth(Controller c, State s) {
 		super(c, s);
 		this.disk = s.getDisk();
-		r.setIAT(RandomGenerator.genExpRV(disk.lambda));
-		r.setArrival(c.getCurrentTime() + r.getIAT());
-		r.setTs(RandomGenerator.genExpRV(1.0 / disk.Ts));
+		r.setIAT(0);
+		r.setArrival(c.getCurrentTime());
+		r.setTs(RandomGenerator.genExpRV(1.0 / disk.getTs()));
 	}
 
 	@Override
@@ -25,8 +25,8 @@ public class DiskBirth extends Event {
 		 */
 		disk.requestQueue.add(this.r);
 
-		if (c.getCurrentTime() >= c.getSimulationTime())
-			disk.numArrivals++;
+		if (c.getCurrentTime() >= s.getSimulationTime())
+			s.logger.numDiskArrivals++;
 		
 		/*
 		 * If this request happens to be the only one in the system (i.e., the
@@ -36,10 +36,16 @@ public class DiskBirth extends Event {
 		 * "service time" according to the distribution of service times and
 		 * adding that to the current time.
 		 */
-		if (disk.requestQueue.size() == 1) {
+		if(!disk.isMM1ServerBusy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
 			c.addEvent(new DiskDeath(c, s, deathTime));
+			disk.setMM1ServerBusy(true);
 		}
+		
+//		if (disk.requestQueue.size() == 1) {
+//			double deathTime = c.getCurrentTime() + r.getTs();
+//			c.addEvent(new DiskDeath(c, s, deathTime));
+//		}
 		
 		/*
 		 * Predict (and hence schedule) when the next birth will occur. We can
@@ -47,7 +53,7 @@ public class DiskBirth extends Event {
 		 * "IAT time" according to the specified distribution of IAT times, and
 		 * adding that to the current time.
 		 */
-		c.addEvent(new DiskBirth(c, s));
+		//c.addEvent(new DiskBirth(c, s));
 	}
 
 	@Override

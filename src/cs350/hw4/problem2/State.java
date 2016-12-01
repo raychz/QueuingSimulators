@@ -1,22 +1,22 @@
 package cs350.hw4.problem2;
 
+import cs350.hw4.problem2.utilities.Logger;
+
 public class State {
 	private MM2System CPU;
 	private MM1System disk;
 	private MM1System network;
-	private Controller c;
 	private String stateName;
+	private double simulationTime;
+	public final Logger logger;
 	
-	public State(String stateName, MM2System CPU, MM1System disk, MM1System network) {
+	public State(String stateName, double simulationTime, MM2System CPU, MM1System disk, MM1System network) {
 		this.stateName = stateName;
+		this.simulationTime = simulationTime;
+		this.logger = new Logger(this);
 		this.CPU = CPU;
 		this.disk = disk;
 		this.network = network;
-	}
-	
-	// Initialize the state of the systems
-	public void init() {
-		// create birth into CPU
 	}
 	
 	public MM2System getCPU() {
@@ -32,6 +32,14 @@ public class State {
 	}
 	
 	public String getStateName() {
-		return this.getStateName();
+		return this.stateName;
+	}
+
+	public void log(String string) {
+		logger.log(string);
+	}
+
+	public double getSimulationTime() {
+		return this.simulationTime;
 	}
 }

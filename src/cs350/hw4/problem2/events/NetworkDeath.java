@@ -4,48 +4,38 @@ import cs350.hw4.problem2.Controller;
 import cs350.hw4.problem2.MM1System;
 import cs350.hw4.problem2.Request;
 import cs350.hw4.problem2.State;
-import cs350.hw4.problem2.utilities.RandomGenerator;
 
-public class DiskDeath extends Event {
-	private final MM1System disk;
+public class NetworkDeath extends Event {
+	private final MM1System network;
 
-	public DiskDeath(Controller c, State s, double deathTime) {
+	public NetworkDeath(Controller c, State s, double deathTime) {
 		super(c, s);
-		this.disk = s.getDisk();
+		this.network = s.getNetwork();
 		this.eventTime = deathTime;
 	}
 
 	@Override
 	public void exec() {
 		// Remove the record of the request from the queue in the system.
-		Request r = disk.requestQueue.remove();
+		Request r = network.requestQueue.remove();
 
-		// Make disk server available
-		disk.setMM1ServerBusy(false);
+		// Make network server available
+		network.setMM1ServerBusy(false);
 
-		
-		// With probability 0.5, the request continues to the CPU.
-		double rand = RandomGenerator.genDouble();
-		if (rand <= 0.5) {
-			c.addEvent(new CPUBirth(c, s, false));
-		}
-
-		// With probability 0.5, the request continues to the network.
-		else {
-			c.addEvent(new NetworkBirth(c, s));
-		}
+		// With probability 1, the request continues directly to the CPU queue
+		// with zero IAT (hence, the false flag).
+		c.addEvent(new CPUBirth(c, s, false));
 
 		// Log stats about request
 		log(r);
 
 		// Upon completion of service, check if other requests
 		// are pending in the queue.
-		if (disk.requestQueue.size() > 0) {
-			//System.out.println("UHOHHHHHHHH THIS SHOULDNT HAPPEN");
-			Request nextReq = disk.requestQueue.peek();
+		if (network.requestQueue.size() > 0) {
+			Request nextReq = network.requestQueue.peek();
 			double deathTime = c.getCurrentTime() + nextReq.getTs();
-			c.addEvent(new DiskDeath(c, s, deathTime));
-			disk.setMM1ServerBusy(true);
+			c.addEvent(new NetworkDeath(c, s, deathTime));
+			network.setMM1ServerBusy(true);
 		}
 	}
 
@@ -62,11 +52,11 @@ public class DiskDeath extends Event {
 
 			// Update state vars in Logger class for gathering stats with every
 			// event.
-			s.logger.numDiskDepartures++;
-			s.logger.DiskTqTotal += r.getTq();
-			s.logger.DiskTwTotal += r.getTw();
-			s.logger.DiskTsTotal += r.getTs();
-			//s.logger.DiskRhoTotal += disk.lambda * r.getTs();
+			s.logger.numNetworkDepartures++;
+			s.logger.NetworkTqTotal += r.getTq();
+			s.logger.NetworkTwTotal += r.getTw();
+			s.logger.NetworkTsTotal += r.getTs();
+			//s.logger.NetworkRhoTotal += network.lambda * r.getTs();
 		}
 	}
 

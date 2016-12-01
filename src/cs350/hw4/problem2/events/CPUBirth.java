@@ -18,15 +18,16 @@ import cs350.hw4.problem2.utilities.RandomGenerator;
  */
 public class CPUBirth extends Event {
 	private final Request r = new Request();
-	//private MM2System m;
 	private final MM2System CPU;
+	private boolean isExternalArrival;
 
-	public CPUBirth(Controller c, State s) {
+	public CPUBirth(Controller c, State s, boolean isExternalArrival) {
 		super(c, s);
 		this.CPU = s.getCPU();
-		this.r.setIAT(RandomGenerator.genExpRV(CPU.lambda));
+		this.isExternalArrival = isExternalArrival;
+		this.r.setIAT(isExternalArrival ? RandomGenerator.genExpRV(CPU.getLambda()) : 0);
 		this.r.setArrival(c.getCurrentTime() + r.getIAT());
-		this.r.setTs(RandomGenerator.genExpRV(1.0 / CPU.Ts));
+		this.r.setTs(RandomGenerator.genExpRV(1.0 / CPU.getTs()));
 	}
 
 	/**
@@ -42,9 +43,12 @@ public class CPUBirth extends Event {
 		 */
 		CPU.requestQueue.add(this.r);
 
-		if (c.getCurrentTime() >= c.getSimulationTime())
-			// TODO
-			c.logger.numArrivals++;
+		if (c.getCurrentTime() >= s.getSimulationTime()) {
+			s.logger.numCPUArrivals++;
+			if (this.isExternalArrival) {
+				s.logger.numSysArrivals++;
+			}
+		}
 
 		/*
 		 * If this request happens to be the only one in the system (i.e., the
@@ -54,16 +58,6 @@ public class CPUBirth extends Event {
 		 * "service time" according to the distribution of service times and
 		 * adding that to the current time.
 		 */
-		// if (m.requestQueue.size() == 1) {
-		// double deathTime = c.getCurrentTime() + r.getTs();
-		// c.addEvent(new Death(c, m, deathTime));
-		// }
-		//
-		// if (m.requestQueue.size() > 0) {
-		// double deathTime = c.getCurrentTime() + r.getTs();
-		// c.addEvent(new Death(c, m, deathTime));
-		// }
-
 		if (!CPU.isCPU1Busy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
 			c.addEvent(new CPU1Death(c, s, deathTime));
@@ -80,9 +74,11 @@ public class CPUBirth extends Event {
 		 * Predict (and hence schedule) when the next birth will occur. We can
 		 * predict when the next birth will occur by generating a random
 		 * "IAT time" according to the specified distribution of IAT times, and
-		 * adding that to the current time.
+		 * adding that to the current time. We do this, iff the birth currently
+		 * being executed is an external arrival.
 		 */
-		c.addEvent(new CPUBirth(c, s));
+		if (this.isExternalArrival)
+			c.addEvent(new CPUBirth(c, s, true));
 	}
 
 	@Override

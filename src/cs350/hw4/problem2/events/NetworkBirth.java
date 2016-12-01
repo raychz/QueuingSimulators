@@ -13,9 +13,9 @@ public class NetworkBirth extends Event {
 	public NetworkBirth(Controller c, State s) {
 		super(c, s);
 		this.network = s.getNetwork();
-		r.setIAT(RandomGenerator.genExpRV(network.lambda));
-		r.setArrival(c.getCurrentTime() + r.getIAT());
-		r.setTs(RandomGenerator.genExpRV(1.0 / network.Ts));
+		r.setIAT(0); // This is an internal event!  There's no IAT lag.
+		r.setArrival(c.getCurrentTime());
+		r.setTs(RandomGenerator.genExpRV(1.0 / network.getTs()));
 	}
 
 	@Override
@@ -25,8 +25,8 @@ public class NetworkBirth extends Event {
 		 */
 		network.requestQueue.add(this.r);
 
-		if (c.getCurrentTime() >= c.getSimulationTime())
-			network.numArrivals++;
+		if (c.getCurrentTime() >= s.getSimulationTime())
+			s.logger.numNetworkArrivals++;
 		
 		/*
 		 * If this request happens to be the only one in the system (i.e., the
@@ -36,10 +36,16 @@ public class NetworkBirth extends Event {
 		 * "service time" according to the distribution of service times and
 		 * adding that to the current time.
 		 */
-		if (network.requestQueue.size() == 1) {
+		if (!network.isMM1ServerBusy()) {
 			double deathTime = c.getCurrentTime() + r.getTs();
-			c.addEvent(new DiskDeath(c, s, deathTime));
+			c.addEvent(new NetworkDeath(c, s, deathTime));
+			network.setMM1ServerBusy(true);
 		}
+		
+//		if (network.requestQueue.size() == 1) {
+//			double deathTime = c.getCurrentTime() + r.getTs();
+//			c.addEvent(new NetworkDeath(c, s, deathTime));
+//		}
 		
 		/*
 		 * Predict (and hence schedule) when the next birth will occur. We can
@@ -47,12 +53,11 @@ public class NetworkBirth extends Event {
 		 * "IAT time" according to the specified distribution of IAT times, and
 		 * adding that to the current time.
 		 */
-		c.addEvent(new DiskBirth(c, s));
+		//c.addEvent(new NetworkBirth(c, s));
 	}
 
 	@Override
 	public double getTime() {
 		return r.getArrival();
 	}
-
 }

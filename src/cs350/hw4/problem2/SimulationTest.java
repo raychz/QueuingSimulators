@@ -22,31 +22,39 @@ public class SimulationTest {
 	}
 
 	public static void start() throws FileNotFoundException, UnsupportedEncodingException {
-		String systemName = "HW3_1a";
-		System.out.printf("-- Now simulating system: %s -- \n\n", systemName);
-		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
+//		String systemName = "HW3_1a";
+//		System.out.printf("-- Now simulating system: %s -- \n\n", systemName);
+//		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
 
 		// HW4.2
 		MM2System CPU1 = new MM2System("CPU1", 40, 0.02);
 		MM1System disk1 = new MM1System("Disk1", 0.1);
 		MM1System network1 = new MM1System("Network1", 0.025);
-		State s1 = new State("HW4.1", CPU1, disk1, network1);
-		Controller c1 = new Controller(1000);
-		c1.start(s1);
+		State s1 = new State("HW4.1", 100, CPU1, disk1, network1);
+		Controller c1 = new Controller(s1);
+		c1.start();
+		
+//		// Testing
+//		MM2System testCPU = new MM2System("CPU1", 40, 0.002);
+//		MM1System testDisk = new MM1System("Disk1", 0.001);
+//		MM1System testNet = new MM1System("Network1", 0.0025);
+//		State testState = new State("testState", 10000, testCPU, testDisk, testNet);
+//		Controller testController = new Controller(testState);
+//		testController.start();
 
-		systemName = "HW3_1b";
-		System.out.printf("-- Now Simulating System %s -- \n\n", systemName);
-		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
-		Controller c2 = new Controller(1000);
-		MM1System m2 = new MM1System(systemName, c2, 6, 0.15);
-		c2.start(m2);
-
-		systemName = "HW3_1c";
-		System.out.printf("-- Now Simulating System %s -- \n\n", systemName);
-		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
-		Controller c3 = new Controller(1000);
-		MM1System m3 = new MM1System(systemName, c3, 6, 0.20);
-		c3.start(m3);
+//		systemName = "HW3_1b";
+//		System.out.printf("-- Now Simulating System %s -- \n\n", systemName);
+//		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
+//		Controller c2 = new Controller(1000);
+//		MM1System m2 = new MM1System(systemName, c2, 6, 0.15);
+//		c2.start(m2);
+//
+//		systemName = "HW3_1c";
+//		System.out.printf("-- Now Simulating System %s -- \n\n", systemName);
+//		System.out.printf("-- Writing log data to: %s.csv -- \n\n", systemName);
+//		Controller c3 = new Controller(1000);
+//		MM1System m3 = new MM1System(systemName, c3, 6, 0.20);
+//		c3.start(m3);
 	}
 
 	public static void test() {
